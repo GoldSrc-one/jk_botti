@@ -104,13 +104,13 @@ inline int strcasematch(const char *s1, const char *s2) {
 	if(!s1 || !s2) 
 		return(0);
 	else 
-		return(!strcasecmp(s1, s2));
+		return(!_stricmp(s1, s2));
 }
 inline int strncasematch(const char *s1, const char *s2, size_t n) {
 	if(!s1 || !s2) 
 		return(0);
 	else 
-		return(!strncasecmp(s1, s2, n));
+		return(!_strnicmp(s1, s2, n));
 }
 
 // Turn a variable/function name into the corresponding string, optionally

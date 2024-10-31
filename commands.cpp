@@ -93,7 +93,8 @@ const cfg_bot_record_t * GetUnusedCfgBotRecord(void)
       return (const cfg_bot_record_t *)NULL;
    
    //
-   int record_indexes[cfg_bot_record_size];
+   //int record_indexes[cfg_bot_record_size];
+   auto record_indexes = new int[cfg_bot_record_size];
    int num_records = 0;
    
    record_indexes[0] = 0;
@@ -981,6 +982,13 @@ static void print_to_client(int, void *arg, char *msg)
    ClientPrint((edict_t *)arg, HUD_PRINTNOTIFY, msg);
 }
 #endif
+
+void WaypointAdd(edict_t* pEntity);
+void WaypointDelete(edict_t* pEntity) {}
+void WaypointUpdate(edict_t* pEntity) {}
+void WaypointCreatePath(edict_t* pEntity, int cmd) {}
+void WaypointRemovePath(edict_t* pEntity, int cmd) {}
+extern int bot_stop;
 
 void ClientCommand( edict_t *pEntity )
 {

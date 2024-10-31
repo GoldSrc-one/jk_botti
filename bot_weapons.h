@@ -219,6 +219,7 @@ qboolean IsValidSecondaryAttack(bot_t &pBot, const bot_weapon_select_t &select, 
 int BotGetBetterWeaponChoice(bot_t &pBot, const bot_weapon_select_t &current, const bot_weapon_select_t *pSelect, const float distance, const float height, qboolean *use_primary, qboolean *use_secondary);
 
 qboolean IsValidToFireAtTheMoment(bot_t &pBot, const bot_weapon_select_t &select);
+qboolean BotIsCarryingWeapon(bot_t& pBot, int weapon_id);
 qboolean BotWeaponCanAttack(bot_t &pBot, const qboolean GoodWeaponsOnly);
 qboolean BotGetGoodWeaponCount(bot_t &pBot, const int stop_count);
 #endif // BOT_WEAPONS_H

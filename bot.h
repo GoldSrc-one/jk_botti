@@ -79,6 +79,8 @@ typedef int BOOL;
 #define WPT_GOAL_LOCATION	8
 #define WPT_GOAL_TRACK_SOUND	9
 #define WPT_GOAL_ENEMY		10
+#define WPT_GOAL_BOMB		20
+#define WPT_GOAL_BOMBSITE	21
 
 // instant damage (from cbase.h)
 #define DMG_CRUSH			(1 << 0)	// crushed by falling or moving object
@@ -127,6 +129,17 @@ typedef struct
    int  iAmmo1;  // amount of ammo in primary reserve
    int  iAmmo2;  // amount of ammo in secondary reserve
 } bot_current_weapon_t;
+
+enum satchel_state_e {
+	SAT_NONE,
+	SAT_GOING_TO_TARGET,
+	SAT_SELECTING1,
+	SAT_THROWING,
+	SAT_READY,
+	SAT_SELECTING2,
+	SAT_TRIGGERING,
+	SAT_TRIGGERED
+};
 
 typedef struct
 {
@@ -302,6 +315,11 @@ typedef struct
    
    qboolean b_set_special_shoot_angle;
    float f_special_shoot_angle;
+
+   satchel_state_e satchel_state;
+   float f_satchel_time;
+   int previous_weapon;
+   Vector v_satchel_position;
 
    bot_current_weapon_t current_weapon;  // one current weapon for each bot
    int m_rgAmmo[MAX_AMMO_SLOTS];  // total ammo amounts (1 array for each bot)

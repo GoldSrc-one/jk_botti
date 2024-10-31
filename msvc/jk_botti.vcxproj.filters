@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\bot.cpp" />
+    <ClCompile Include="..\bot_chat.cpp" />
+    <ClCompile Include="..\bot_client.cpp" />
+    <ClCompile Include="..\bot_combat.cpp" />
+    <ClCompile Include="..\bot_config_init.cpp" />
+    <ClCompile Include="..\bot_models.cpp" />
+    <ClCompile Include="..\bot_navigate.cpp" />
+    <ClCompile Include="..\bot_query_hook.cpp" />
+    <ClCompile Include="..\bot_query_hook_linux.cpp" />
+    <ClCompile Include="..\bot_query_hook_win32.cpp" />
+    <ClCompile Include="..\bot_skill.cpp" />
+    <ClCompile Include="..\bot_sound.cpp" />
+    <ClCompile Include="..\bot_weapons.cpp" />
+    <ClCompile Include="..\commands.cpp" />
+    <ClCompile Include="..\dll.cpp" />
+    <ClCompile Include="..\engine.cpp" />
+    <ClCompile Include="..\geneticalg.cpp" />
+    <ClCompile Include="..\h_export.cpp" />
+    <ClCompile Include="..\neuralnet.cpp" />
+    <ClCompile Include="..\random_num.cpp" />
+    <ClCompile Include="..\safe_snprintf.cpp" />
+    <ClCompile Include="..\util.cpp" />
+    <ClCompile Include="..\waypoint.cpp" />
+    <ClCompile Include="..\zlib\gzio.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\deflate.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\compress.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\adler32.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\crc32.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\zutil.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\trees.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\inflate.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\inftrees.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\zlib\inffast.c">
+      <Filter>zlib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\bot.h" />
+    <ClInclude Include="..\bot_client.h" />
+    <ClInclude Include="..\bot_config_init.h" />
+    <ClInclude Include="..\bot_func.h" />
+    <ClInclude Include="..\bot_inline_funcs.h" />
+    <ClInclude Include="..\bot_query_hook.h" />
+    <ClInclude Include="..\bot_skill.h" />
+    <ClInclude Include="..\bot_sound.h" />
+    <ClInclude Include="..\bot_weapons.h" />
+    <ClInclude Include="..\geneticalg.h" />
+    <ClInclude Include="..\neuralnet.h" />
+    <ClInclude Include="..\new_baseclass.h" />
+    <ClInclude Include="..\player.h" />
+    <ClInclude Include="..\safe_snprintf.h" />
+    <ClInclude Include="..\util.h" />
+    <ClInclude Include="..\version.h" />
+    <ClInclude Include="..\waypoint.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="zlib">
+      <UniqueIdentifier>{2577e2fd-44ff-4d15-8c7b-2aea24675e6e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

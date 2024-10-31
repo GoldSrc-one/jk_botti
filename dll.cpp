@@ -614,7 +614,7 @@ static void StartFrame( void )
                continue;
             
             if (FBitSet(pPlayer->v.flags, FL_CLIENT) && !FBitSet(pPlayer->v.flags, FL_PROXY) && 
-               !(FBitSet(pPlayer->v.flags, FL_FAKECLIENT) || FBitSet(pPlayer->v.flags, FL_THIRDPARTYBOT)))
+               !(/*FBitSet(pPlayer->v.flags, FL_FAKECLIENT) || */FBitSet(pPlayer->v.flags, FL_THIRDPARTYBOT)))
             {
                WaypointThink(pPlayer);
                

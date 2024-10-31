@@ -8,7 +8,7 @@
 #define BOT_INLINE_FUNCS
 
 #include <inttypes.h>
-#include <sys/time.h>
+//#include <sys/time.h>
 
 // Manual branch optimization for GCC 3.0.0 and newer
 #if !defined(__GNUC__) || __GNUC__ < 3
@@ -148,6 +148,15 @@ inline qboolean FVisible( const Vector &vecOrigin, edict_t *pEdict, edict_t * pO
 inline qboolean FVisible( const Vector &vecOrigin, edict_t *pEdict )
 {
    return(FVisible(vecOrigin, pEdict, (edict_t **)NULL));
+}
+
+inline edict_t* UTIL_FindC4(edict_t* pentStart = NULL) {
+	edict_t* grenade = pentStart;
+	while(grenade = UTIL_FindEntityByClassname(grenade, "grenade")) {
+		if(strcmp(STRING(grenade->v.model), "models/w_c4.mdl") == 0)
+			return grenade;
+	}
+	return NULL;
 }
 
 #endif /*BOT_INLINE_FUNCS*/

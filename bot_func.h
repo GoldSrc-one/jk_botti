@@ -11,6 +11,7 @@
 
 //bot.cpp:
 void BotCreate( const char *skin, const char *name, int skill, int top_color, int bottom_color, int cfg_bot_index );
+qboolean BotEntityIsVisible(bot_t& pBot, const Vector& dest);
 void BotThink( bot_t &pBot );
 void BotCheckTeamplay(void);
 void BotKick(bot_t &pBot);
@@ -35,6 +36,8 @@ void BotRemoveEnemy( bot_t &pBot, qboolean b_keep_tracking);
 void BotFindEnemy( bot_t &pBot );
 void BotShootAtEnemy( bot_t &pBot );
 qboolean BotShootTripmine( bot_t &pBot );
+void BotThrowSatchel(bot_t& pBot);
+void BotTriggerSatchel(bot_t& pBot);
 
 // bot_models.cpp:
 void LoadBotModels(void);
@@ -61,6 +64,7 @@ qboolean BotCheckWallOnRight( bot_t &pBot );
 qboolean BotCheckWallOnBack( bot_t &pBot );
 qboolean BotCheckWallOnForward( bot_t &pBot );
 void BotLookForDrop( bot_t &pBot );
+qboolean BotDefuseC4( bot_t& pBot );
 
 // commands.cpp:
 const cfg_bot_record_t * GetUnusedCfgBotRecord(void);

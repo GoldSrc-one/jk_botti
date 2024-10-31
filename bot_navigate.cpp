@@ -301,6 +301,17 @@ static void BotEvaluateGoal( bot_t &pBot )
    }
 }
 
+static qboolean AreTeamMates(edict_t* pOther, edict_t* pEdict) {
+    // is team play enabled?
+    if(is_team_play) {
+        char other_model[MAX_TEAMNAME_LENGTH];
+        char edict_model[MAX_TEAMNAME_LENGTH];
+
+        return(!stricmp(UTIL_GetTeam(pOther, other_model, sizeof(other_model)), UTIL_GetTeam(pEdict, edict_model, sizeof(edict_model))));
+    }
+
+    return FALSE;
+}
 
 //
 static int BotGetSoundWaypoint( bot_t &pBot, edict_t *pTrackSoundEdict, edict_t ** pNewTrackSoundEdict )
@@ -326,6 +337,12 @@ static int BotGetSoundWaypoint( bot_t &pBot, edict_t *pTrackSoundEdict, edict_t 
       // ignore sounds created by bot itself
       if(pCurrentSound->m_iBotOwner == (&pBot - &bots[0]))
          continue;
+
+      if(!FNullEnt(pCurrentSound->m_pEdict) && AreTeamMates(pBot.pEdict, pCurrentSound->m_pEdict))
+          continue;
+
+      if(!FNullEnt(pCurrentSound->m_pEdict->v.owner) && AreTeamMates(pBot.pEdict, pCurrentSound->m_pEdict->v.owner))
+          continue;
       
       // we want specific waypoint?
       if(!FNullEnt(pTrackSoundEdict) && pCurrentSound->m_pEdict != pTrackSoundEdict)
@@ -417,6 +434,22 @@ static void BotFindWaypointGoal( bot_t &pBot )
    
    edict_t *pEdict = pBot.pEdict;
    bot_weapon_select_t *pSelect = &weapon_select[0];
+
+   //HACK
+   if(index == -1) {
+       edict_t* c4 = UTIL_FindC4();
+       if(c4) {
+           index = WaypointFindNearest(c4, 1024);
+           if(index != -1) {
+               pBot.wpt_goal_type = WPT_GOAL_BOMB;
+               pBot.waypoint_goal = index;
+               pBot.pTrackSoundEdict = NULL;
+               pBot.f_track_sound_time = -1;
+
+               goto exit;
+           }
+       }
+   }
 
    if (pEdict->v.health * RANDOM_FLOAT2(0.9f, 1.0f/0.9f) < VALVE_MAX_NORMAL_HEALTH * 0.25f)
    {
@@ -649,7 +682,74 @@ static void BotFindWaypointGoal( bot_t &pBot )
          goto exit;
       }
    }
+   
+   //HACK
+   if(index == -1 && (pBot.satchel_state == SAT_NONE && BotIsCarryingWeapon(pBot, VALVE_WEAPON_SATCHEL))) {
+       edict_t* bombTarget = NULL;
+       bombTarget = UTIL_FindEntityByClassname(bombTarget, "func_bomb_target");
+       if(RANDOM_LONG2(0, 1))
+           bombTarget = UTIL_FindEntityByClassname(bombTarget, "func_bomb_target");
 
+       if(bombTarget) {
+           Vector center;
+           center[0] = (bombTarget->v.mins[0] + bombTarget->v.maxs[0]) * 0.5f;
+           center[1] = (bombTarget->v.mins[1] + bombTarget->v.maxs[1]) * 0.5f;
+           center[2] = (bombTarget->v.mins[2] + bombTarget->v.maxs[2]) * 0.5f;
+           index = WaypointFindNearest(center, bombTarget, 1024);
+
+           if(index != -1) {
+               pBot.satchel_state = SAT_GOING_TO_TARGET;
+
+               pBot.wpt_goal_type = WPT_GOAL_BOMBSITE;
+               pBot.waypoint_goal = index;
+               pBot.pTrackSoundEdict = NULL;
+               pBot.f_track_sound_time = -1;
+
+               goto exit;
+           }
+       }
+   }
+
+   //HACK
+   if(index == -1) {
+       edict_t* enemies[32] = {};
+       int numEnemies = 0;
+       for(int i = 0; i < gpGlobals->maxClients; i++) {
+           edict_t* player = g_engfuncs.pfnPEntityOfEntIndex(i + 1);
+           if(!player || player->v.flags == FL_PROXY || player->v.deadflag != DEAD_NO || player->v.takedamage == DAMAGE_NO || player->v.solid == SOLID_NOT)
+               continue;
+           if(AreTeamMates(pEdict, player))
+               continue;
+
+           enemies[numEnemies++] = player;
+       }
+       if(numEnemies > 0) {
+           edict_t* enemy = enemies[RANDOM_LONG2(0, numEnemies - 1)];
+
+           double minDiff = 999999;
+           for(int wi = 0; wi < num_waypoints; wi++) {
+               if((waypoints[wi].flags & W_FL_DELETED) || (waypoints[wi].flags & W_FL_AIMING))
+                   continue;
+
+               Vector botToWaypoint = waypoints[wi].origin - pEdict->v.origin;
+               Vector enemyToWaypoint = waypoints[wi].origin - enemy->v.origin;
+               double diff = fabs(botToWaypoint.Length() - enemyToWaypoint.Length());
+               if(diff < minDiff) {
+                   minDiff = diff;
+                   index = wi;
+               }
+           }
+           if(index != -1) {
+               pBot.wpt_goal_type = WPT_GOAL_ENEMY;
+               pBot.waypoint_goal = index;
+               pBot.pTrackSoundEdict = NULL;
+               pBot.f_track_sound_time = -1;
+
+               goto exit;
+           }
+       }
+   }
+   
    // we couldn't find ANYTHING, go somewhere random
    if (index == -1)
    {
@@ -921,6 +1021,11 @@ qboolean BotHeadTowardWaypoint( bot_t &pBot )
       // check if the bot has reached the goal waypoint...
       if (pBot.curr_waypoint_index == pBot.waypoint_goal)
       {
+          //HACK
+          if(pBot.wpt_goal_type == WPT_GOAL_BOMBSITE && pBot.satchel_state == SAT_GOING_TO_TARGET) {
+              BotThrowSatchel(pBot);
+          }
+
          // if this waypoint has an item, make sure we get it
          if (waypoints[pBot.waypoint_goal].flags & (W_FL_LONGJUMP| W_FL_HEALTH | W_FL_ARMOR | W_FL_AMMO | W_FL_WEAPON))
          {
@@ -2360,3 +2465,24 @@ void BotLookForDrop( bot_t &pBot )
    }
 }
 
+qboolean BotDefuseC4(bot_t& pBot) {
+    edict_t* c4 = UTIL_FindC4();
+    Vector c4_origin = c4->v.origin;
+    if(!BotEntityIsVisible(pBot, c4_origin))
+        return FALSE;
+
+    Vector aim_origin = GetGunPosition(pBot.pEdict);
+    Vector aim_dir = c4_origin - aim_origin;
+    Vector target_angle = UTIL_VecToAngles(aim_dir);
+
+    pBot.pEdict->v.idealpitch = UTIL_WrapAngle(target_angle.x) / -3.f;
+    pBot.pEdict->v.ideal_yaw = UTIL_WrapAngle(target_angle.y);
+
+    float c4_distance = aim_dir.Length();
+    if(c4_distance < 128) {
+        pBot.pEdict->v.button |= IN_DUCK;
+    }
+    if(c4_distance < 64) {
+        pBot.pEdict->v.button |= IN_USE;
+    }
+}

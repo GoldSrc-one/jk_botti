@@ -36,7 +36,7 @@
 //opcode + sizeof pointer
 #define BYTES_SIZE (JMP_SIZE + PTR_SIZE)
 
-typedef ssize_t (PASCAL * sendto_func)(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len);
+typedef size_t (PASCAL * sendto_func)(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len);
 
 static bool is_sendto_hook_setup = false;
 
@@ -67,13 +67,14 @@ inline void reset_sendto_hook(void)
 }
 
 // Replacement sendto function
-static ssize_t PASCAL __replacement_sendto(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
+static size_t PASCAL __replacement_sendto(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
 {
 	return sendto_hook(socket, message, length, flags, dest_addr, dest_len);
 }
 
+#pragma comment(lib, "Ws2_32.lib")
 //
-ssize_t PASCAL call_original_sendto(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
+size_t PASCAL call_original_sendto(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
 {
 	WSABUF iov = {0,};
 	iov.buf = (char*)message;

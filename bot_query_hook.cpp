@@ -43,7 +43,7 @@ static bool msg_get_string(const unsigned char * &msg, size_t &len, char * name,
 }
 
 // find bot connection times and replace
-ssize_t PASCAL handle_player_reply(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
+size_t PASCAL handle_player_reply(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
 {
 /*
 (int32) Header
@@ -113,7 +113,7 @@ ssize_t PASCAL handle_player_reply(int socket, const void *message, size_t lengt
 }
 
 // find number of bots and replace with zero
-ssize_t PASCAL handle_goldsrc_server_info_reply(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
+size_t PASCAL handle_goldsrc_server_info_reply(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
 {
 /*
 Header 		byte 	Always equal to 'm' (0x6D.)
@@ -159,7 +159,7 @@ Bots	 	byte 	Number of bots on the server.
 	unsigned char * newmsg = (unsigned char *)alloca(length);
 	memcpy(newmsg, message, length);
 
-	ssize_t len = length - 5;
+	size_t len = length - 5;
 	unsigned char * msg = (unsigned char*)newmsg + 5;
 
 	bool is_mod;
@@ -369,7 +369,7 @@ out:
 }
 
 // find number of bots and replace with zero
-ssize_t PASCAL handle_source_server_info_reply(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
+size_t PASCAL handle_source_server_info_reply(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
 {
 /*
 Header 		byte 	Always equal to 'I' (0x49.)
@@ -408,7 +408,7 @@ VAC 		byte 	Specifies whether the server uses VAC:
 	unsigned char * newmsg = (unsigned char *)alloca(length);
 	memcpy(newmsg, message, length);
 
-	ssize_t len = length - 5;
+	size_t len = length - 5;
 	unsigned char * msg = (unsigned char*)newmsg + 5;
 
 	// protocol
@@ -504,7 +504,7 @@ out:
 }
 
 //
-ssize_t PASCAL sendto_hook(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
+size_t PASCAL sendto_hook(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
 {
 	const unsigned char * orig_buf = (unsigned char*)message;
 
@@ -515,19 +515,19 @@ ssize_t PASCAL sendto_hook(int socket, const void *message, size_t length, int f
 
 	if(length > 5 && orig_buf[0] == 0xff && orig_buf[1] == 0xff && orig_buf[2] == 0xff && orig_buf[3] == 0xff)
 	{
-		// check if this is server info reply packet (ÿÿÿÿm)
+		// check if this is server info reply packet (ï¿½ï¿½ï¿½ï¿½m)
 		// old GoldSrc format
 		if (orig_buf[4] == 'm') {
 			return handle_goldsrc_server_info_reply(socket, message, length, flags, dest_addr, dest_len);
 		}
 
-		// check if this is server info reply packet (ÿÿÿÿI)
+		// check if this is server info reply packet (ï¿½ï¿½ï¿½ï¿½I)
 		// new Source format (GoldSrc engine has switched to use this)
 		if (orig_buf[4] == 'I') {
 			return handle_source_server_info_reply(socket, message, length, flags, dest_addr, dest_len);
 		}
 
-		// check if this is player reply packet (ÿÿÿÿD)
+		// check if this is player reply packet (ï¿½ï¿½ï¿½ï¿½D)
 		if(orig_buf[4] == 'D') {
 			return(handle_player_reply(socket, message, length, flags, dest_addr, dest_len));
 		}

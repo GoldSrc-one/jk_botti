@@ -1880,3 +1880,72 @@ qboolean BotShootTripmine( bot_t &pBot )
    return ret;
 }
 
+void BotThrowSatchel(bot_t& pBot) {
+    if(pBot.satchel_state <= SAT_NONE || pBot.satchel_state >= SAT_READY || pBot.f_satchel_time > gpGlobals->time)
+        return;
+
+    if(pBot.satchel_state == SAT_GOING_TO_TARGET) {
+        pBot.previous_weapon = pBot.current_weapon_index;
+
+        UTIL_SelectItem(pBot.pEdict, "weapon_satchel");
+        pBot.f_satchel_time = gpGlobals->time + 0.5f + 0.1f;
+        pBot.satchel_state = SAT_SELECTING1;
+        return;
+    }
+
+    if(pBot.satchel_state == SAT_SELECTING1) {
+        pBot.pEdict->v.button |= IN_ATTACK2;
+        pBot.satchel_state = SAT_THROWING;
+        return;
+    }
+
+    if(pBot.satchel_state == SAT_THROWING) {
+        pBot.current_weapon_index = pBot.previous_weapon;
+
+        if(pBot.previous_weapon != -1)
+            UTIL_SelectItem(pBot.pEdict, weapon_select[pBot.current_weapon_index].weapon_name);
+
+        pBot.v_satchel_position = pBot.pEdict->v.origin;
+        pBot.f_satchel_time = gpGlobals->time + 0.5f + 0.1f;
+        pBot.satchel_state = SAT_READY;
+        return;
+    }
+}
+
+void BotTriggerSatchel(bot_t& pBot) {
+    if(pBot.satchel_state < SAT_READY || pBot.satchel_state >= SAT_TRIGGERED || pBot.f_satchel_time > gpGlobals->time)
+        return;
+
+    if(pBot.satchel_state == SAT_READY) {
+        Vector satchelDir = pBot.v_satchel_position - pBot.pEdict->v.origin;
+        if(satchelDir.Length() < 512)
+            return; //don't nuke self
+
+        pBot.previous_weapon = pBot.current_weapon_index;
+
+        UTIL_SelectItem(pBot.pEdict, "weapon_satchel");
+        pBot.f_satchel_time = gpGlobals->time + 0.5f + 0.1f;
+        pBot.satchel_state = SAT_SELECTING2;
+        return;
+    }
+
+    if(pBot.satchel_state == SAT_SELECTING2) {
+        pBot.pEdict->v.button |= IN_ATTACK;
+        pBot.satchel_state = SAT_TRIGGERING;
+        return;
+    }
+
+    if(pBot.satchel_state == SAT_TRIGGERING) {
+        pBot.current_weapon_index = pBot.previous_weapon;
+
+        if(pBot.previous_weapon != -1)
+            UTIL_SelectItem(pBot.pEdict, weapon_select[pBot.current_weapon_index].weapon_name);
+
+        pBot.satchel_state = SAT_TRIGGERED;
+        return;
+    }
+}
+
+void BotDeployTripmine(bot_t& pBot) {
+
+}

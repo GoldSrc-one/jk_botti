@@ -26,16 +26,16 @@ static unsigned int fast_generate_random(void)
 }
 
 
-void fast_random_seed(unsigned int seed)
+/*void fast_random_seed(unsigned int seed)
 {
    rnd_idnum[0] = seed;
    rnd_idnum[1] = ~(seed + 6);
    rnd_idnum[1] = fast_generate_random();
-}
+}*/
 
 
 /* supports range INT_MIN, INT_MAX */
-int RANDOM_LONG2(int lLow, int lHigh) 
+/*int RANDOM_LONG2(int lLow, int lHigh) 
 {
    const double c_divider = ((unsigned long long)1) << 32; // div by (1<<32)
    double rnd;
@@ -48,10 +48,10 @@ int RANDOM_LONG2(int lLow, int lHigh)
    rnd /= c_divider; // div by (1<<32)
    
    return (int)(rnd + (double)lLow);
-}
+}*/
 
 
-float RANDOM_FLOAT2(float flLow, float flHigh) 
+/*float RANDOM_FLOAT2(float flLow, float flHigh) 
 {
    const double c_divider = (((unsigned long long)1) << 32) - 1; // div by (1<<32)-1
    double rnd;
@@ -64,4 +64,4 @@ float RANDOM_FLOAT2(float flLow, float flHigh)
    rnd /= c_divider; // div by (1<<32)-1
    
    return (float)(rnd + (double)flLow);
-}
+}*/

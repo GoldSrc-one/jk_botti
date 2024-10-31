@@ -38,7 +38,7 @@
 //opcode + sizeof pointer
 #define BYTES_SIZE (JMP_SIZE + PTR_SIZE)
 
-typedef ssize_t (*sendto_func)(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len);
+typedef size_t (*sendto_func)(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len);
 
 static bool is_sendto_hook_setup = false;
 
@@ -76,13 +76,13 @@ inline void reset_sendto_hook(void)
 }
 
 // Replacement sendto function
-static ssize_t __replacement_sendto(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
+static size_t __replacement_sendto(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
 {
 	return sendto_hook(socket, message, length, flags, dest_addr, dest_len);
 }
 
 //
-ssize_t call_original_sendto(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
+size_t call_original_sendto(int socket, const void *message, size_t length, int flags, const struct sockaddr *dest_addr, socklen_t dest_len)
 {
 	/* Emulate sendto using sendmsg.. this is faster than restoring/replacing sendto() code. */
 	/* Also, internally libc sendto() is wrapper around sendmsg(). */

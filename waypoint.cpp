@@ -232,7 +232,6 @@ void WaypointInit(void)
    g_lifts_added = 0;
 }
 
-
 static void WaypointAddPath(short int add_index, short int path_index)
 {
    int i;
@@ -253,10 +252,6 @@ static void WaypointAddPath(short int add_index, short int path_index)
          return;
       }
       
-#ifdef _DEBUG
-      count++;
-      if (count > 100) WaypointDebug();
-#endif
    }
    
    if(i >= MAX_PATH_INDEX)
@@ -264,7 +259,6 @@ static void WaypointAddPath(short int add_index, short int path_index)
    
    p.index[p.last_idx_used++] = path_index;
 }
-
 
 static void WaypointDeletePath(short int path_index, short int del_index)
 {
@@ -276,10 +270,6 @@ static void WaypointDeletePath(short int path_index, short int del_index)
       if(p.index[i] == del_index)
          p.index[i] = -1;
       
-#ifdef _DEBUG
-      count++;
-      if (count > 100) WaypointDebug();
-#endif
    }
 }
 
@@ -1124,7 +1114,7 @@ edict_t *WaypointFindItem( int wpt_index )
 }
 
 
-static void WaypointAdd(edict_t *pEntity)
+void WaypointAdd(edict_t *pEntity)
 {
    int index;
    int player_index = ENTINDEX(pEntity) - 1;
@@ -1338,7 +1328,7 @@ static void WaypointAddAiming(edict_t *pEntity)
 }
 
 
-static void WaypointDelete(edict_t *pEntity)
+void WaypointDelete(edict_t *pEntity)
 {
    int index;
 
@@ -1410,7 +1400,7 @@ static void WaypointDelete(edict_t *pEntity)
 }
 
 
-static void WaypointUpdate(edict_t *pEntity)
+void WaypointUpdate(edict_t *pEntity)
 {
    int index;
    int mask;
@@ -1433,7 +1423,7 @@ static void WaypointUpdate(edict_t *pEntity)
 
 
 // allow player to manually create a path from one waypoint to another
-static void WaypointCreatePath(edict_t *pEntity, int cmd)
+void WaypointCreatePath(edict_t *pEntity, int cmd)
 {
    static int waypoint1 = -1;  // initialized to unassigned
    static int waypoint2 = -1;  // initialized to unassigned
@@ -1787,9 +1777,9 @@ qboolean WaypointLoad(edict_t *pEntity)
       {
          for(int i = 0; i < num_waypoints; i++)
          {
-            waypoints[i].__reserved[0] = 0;
-            waypoints[i].__reserved[1] = 0;
-            waypoints[i].__reserved[2] = 0;
+            waypoints[i].reserved[0] = 0;
+            waypoints[i].reserved[1] = 0;
+            waypoints[i].reserved[2] = 0;
          }
       }
 

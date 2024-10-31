@@ -221,6 +221,11 @@ static void BotSpawnInit( bot_t &pBot )
    pBot.b_set_special_shoot_angle = FALSE;
    pBot.f_special_shoot_angle = 0.0;
 
+   pBot.satchel_state = SAT_NONE;
+   pBot.f_satchel_time = 0.0;
+   pBot.previous_weapon = -1;
+   pBot.v_satchel_position = Vector(0, 0, 0);
+
    pBot.f_weaponchange_time = 0.0;
    
    pBot.f_pause_look_time = 0.0;
@@ -989,7 +994,7 @@ static int BotInFieldOfView(bot_t &pBot, const Vector & dest)
 }
 
 
-static qboolean BotEntityIsVisible( bot_t &pBot, const Vector & dest )
+qboolean BotEntityIsVisible( bot_t &pBot, const Vector & dest )
 {
    TraceResult tr;
 
@@ -1476,7 +1481,7 @@ endloop:
 static qboolean BotLookForGrenades( bot_t &pBot )
 {
    static const char * grenade_names[] = {
-      "grenade", "monster_satchel", /*"monster_snark",*/ "rpg_rocket", "hvr_rocket",
+      "grenade", /*"monster_satchel", "monster_snark",*/ "rpg_rocket", "hvr_rocket",
       NULL,
    };
 
@@ -1705,6 +1710,31 @@ static void BotJustWanderAround(bot_t &pBot, float moved_distance)
 {
    edict_t *pEdict = pBot.pEdict;
 
+   edict_t *c4 = UTIL_FindC4();
+
+   if(pBot.satchel_state > SAT_GOING_TO_TARGET && pBot.satchel_state < SAT_READY) {
+       BotThrowSatchel(pBot);
+   }
+   else if(pBot.satchel_state == SAT_READY && c4) {
+       BotTriggerSatchel(pBot);
+   }
+   else if(pBot.satchel_state > SAT_READY && pBot.satchel_state < SAT_TRIGGERED) {
+       BotTriggerSatchel(pBot);
+   }
+
+   if(c4) {
+       if(pBot.wpt_goal_type != WPT_GOAL_BOMB) {
+           pBot.wpt_goal_type = WPT_GOAL_NONE;
+           pBot.waypoint_goal = -1;
+       }
+
+       //disable grenade avoidance
+       pBot.f_grenade_search_time = gpGlobals->time + 60.f;
+
+       if(BotDefuseC4(pBot))
+           return;
+   }
+
    // no enemy, let's just wander around...
 
    // logo spraying...
@@ -1728,7 +1758,7 @@ static void BotJustWanderAround(bot_t &pBot, float moved_distance)
    if (pBot.b_see_tripmine && !FNullEnt(pBot.tripmine_edict))
    {
       // check if bot can shoot the tripmine...
-      if ((pBot.b_shoot_tripmine) && BotShootTripmine( pBot ))
+      if (false && (pBot.b_shoot_tripmine) && BotShootTripmine( pBot ))
       {
          // shot at tripmine, may or may not have hit it, clear
          // flags anyway, next BotFindItem will see it again if
@@ -2563,7 +2593,7 @@ void BotThink( bot_t &pBot )
    BotUpdateHearingSensitivity(pBot);
 
    // does bot need to say a message and time to say a message?
-   if ((pBot.b_bot_say) && (pBot.f_bot_say < gpGlobals->time))
+   if (false && (pBot.b_bot_say) && (pBot.f_bot_say < gpGlobals->time))
    {
       pBot.b_bot_say = FALSE;
 

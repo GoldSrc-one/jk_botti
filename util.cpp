@@ -513,7 +513,8 @@ void SaveAliveStatus(edict_t * pPlayer)
 //
 float UTIL_GetTimeSinceRespawn(edict_t * pPlayer)
 {
-   int idx;
+    return -1.0;
+   /*int idx;
    
    idx = ENTINDEX(pPlayer) - 1;
    if(idx < 0 || idx >= gpGlobals->maxClients)
@@ -527,7 +528,7 @@ float UTIL_GetTimeSinceRespawn(edict_t * pPlayer)
    else
    {
       return(gpGlobals->time - players[idx].last_time_dead);
-   }
+   }*/
 }
 
 
@@ -594,7 +595,7 @@ void CheckPlayerChatProtection(edict_t * pPlayer)
 //
 qboolean IsPlayerChatProtected(edict_t * pPlayer)
 {
-   int idx;
+   /*int idx;
    
    idx = ENTINDEX(pPlayer) - 1;
    if(idx < 0 || idx >= gpGlobals->maxClients)
@@ -604,7 +605,7 @@ qboolean IsPlayerChatProtected(edict_t * pPlayer)
    {
       return TRUE;
    }
-   
+   */
    return FALSE;
 }
 
@@ -996,7 +997,8 @@ void UTIL_ConsolePrintf( char *fmt, ... )
 void UTIL_AssertConsolePrintf(const char *file, const char *str, int line)
 {
    UTIL_ConsolePrintf("[ASSERT] '%s' : '%s' : 'line %d'", file, str, line);
-   __asm__ ("int $3");
+   //__asm__ ("int $3");
+   __debugbreak();
 }
 
 char* UTIL_VarArgs2( char * string, size_t strlen, char *format, ... )
