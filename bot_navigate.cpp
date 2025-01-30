@@ -2475,7 +2475,7 @@ qboolean BotDefuseC4(bot_t& pBot) {
     Vector aim_dir = c4_origin - aim_origin;
     Vector target_angle = UTIL_VecToAngles(aim_dir);
 
-    pBot.pEdict->v.idealpitch = UTIL_WrapAngle(target_angle.x) / -3.f;
+    pBot.pEdict->v.idealpitch = -UTIL_WrapAngle(target_angle.x);
     pBot.pEdict->v.ideal_yaw = UTIL_WrapAngle(target_angle.y);
 
     float c4_distance = aim_dir.Length();
@@ -2485,4 +2485,5 @@ qboolean BotDefuseC4(bot_t& pBot) {
     if(c4_distance < 64) {
         pBot.pEdict->v.button |= IN_USE;
     }
+    return TRUE;
 }
