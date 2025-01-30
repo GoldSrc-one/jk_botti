@@ -959,6 +959,9 @@ void BotFindEnemy( bot_t &pBot )
          if (FIsClassname(pMonster, "monster_snark"))
             continue; // skip snarks
 
+         if (FIsClassname(pMonster, "hostage_entity") || FIsClassname(pMonster, "monster_scientist"))
+             continue; // skip hostages
+
          if (pMonster->v.health > 4000)
 	    continue; // skip monsters with large health
 
