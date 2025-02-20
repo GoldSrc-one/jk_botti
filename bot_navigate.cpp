@@ -2466,6 +2466,11 @@ void BotLookForDrop( bot_t &pBot )
 }
 
 qboolean BotDefuseC4(bot_t& pBot) {
+    char team[16];
+    UTIL_GetTeam(pBot.pEdict, team, 16);
+    if(!(strcmp(team, "CT") == 0))
+        return FALSE;
+
     edict_t* c4 = UTIL_FindC4();
     Vector c4_origin = c4->v.origin;
     if(!BotEntityIsVisible(pBot, c4_origin))

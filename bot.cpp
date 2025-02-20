@@ -1716,7 +1716,18 @@ static void BotJustWanderAround(bot_t &pBot, float moved_distance)
        BotThrowSatchel(pBot);
    }
    else if(pBot.satchel_state == SAT_READY && c4) {
+       for(int i = 0; i < gpGlobals->maxClients; i++) {
+           edict_t* player = g_engfuncs.pfnPEntityOfEntIndex(i + 1);
+           if(!player || player->v.flags == FL_PROXY || player->v.deadflag != DEAD_NO || player->v.takedamage == DAMAGE_NO || player->v.solid == SOLID_NOT)
+               continue;
+           if(AreTeamMates(pBot.pEdict, player))
+               continue;
+
+           if((player->v.origin - c4->v.origin).Length() < 256) {
        BotTriggerSatchel(pBot);
+               break;
+   }
+       }
    }
    else if(pBot.satchel_state > SAT_READY && pBot.satchel_state < SAT_TRIGGERED) {
        BotTriggerSatchel(pBot);

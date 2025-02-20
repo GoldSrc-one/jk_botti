@@ -589,7 +589,7 @@ static qboolean FCanShootInHead(edict_t * pEdict, edict_t * pTarget, const Vecto
 }
 
 
-static qboolean AreTeamMates(edict_t * pOther, edict_t * pEdict) 
+qboolean AreTeamMates(edict_t * pOther, edict_t * pEdict) 
 {
    // is team play enabled?
    if (is_team_play)

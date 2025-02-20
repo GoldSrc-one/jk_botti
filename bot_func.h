@@ -31,6 +31,7 @@ void BotAimPost( bot_t &pBot );
 void free_posdata_list(int idx);
 void GatherPlayerData(edict_t * pEdict);
 qboolean FPredictedVisible(bot_t &pBot);
+qboolean AreTeamMates(edict_t* pOther, edict_t* pEdict);
 void BotUpdateHearingSensitivity(bot_t &pBot);
 void BotRemoveEnemy( bot_t &pBot, qboolean b_keep_tracking);
 void BotFindEnemy( bot_t &pBot );
