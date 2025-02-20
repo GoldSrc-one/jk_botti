@@ -726,6 +726,8 @@ static void BotFindWaypointGoal( bot_t &pBot )
        if(numEnemies > 0) {
            edict_t* enemy = enemies[RANDOM_LONG2(0, numEnemies - 1)];
 
+           bool flanking = RANDOM_LONG2(0, 1);
+           if(flanking) {
            double minDiff = 999999;
            for(int wi = 0; wi < num_waypoints; wi++) {
                if((waypoints[wi].flags & W_FL_DELETED) || (waypoints[wi].flags & W_FL_AIMING))
@@ -738,6 +740,10 @@ static void BotFindWaypointGoal( bot_t &pBot )
                    minDiff = diff;
                    index = wi;
                }
+           }
+           }
+           else {
+               index = WaypointFindNearest(enemy->v.origin, enemy, 1024);
            }
            if(index != -1) {
                pBot.wpt_goal_type = WPT_GOAL_ENEMY;
