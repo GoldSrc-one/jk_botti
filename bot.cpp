@@ -2580,7 +2580,7 @@ void BotThink( bot_t &pBot )
    pBot.total_msecval += pBot.msecval / 1000.0;
    pBot.total_frame_time += pBot.f_frame_time;
 
-#if _DEBUG
+#if _DEBUG_VERBOSE
    if(&pBot==&bots[0] && pBot.total_counter++ > 10)
    {
       UTIL_ConsolePrintf("total msecval count   : %9.4f", pBot.total_msecval);
