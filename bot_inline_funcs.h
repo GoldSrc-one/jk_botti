@@ -155,6 +155,8 @@ inline edict_t* UTIL_FindC4(edict_t* pentStart = NULL) {
 	while(grenade = UTIL_FindEntityByClassname(grenade, "grenade")) {
 		if(strcmp(STRING(grenade->v.model), "models/w_c4.mdl") == 0)
 			return grenade;
+		if(strcmp(STRING(grenade->v.model), "cstrike/models/w_c4.mdl") == 0)
+			return grenade;
 	}
 	return NULL;
 }
