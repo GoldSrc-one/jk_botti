@@ -959,6 +959,9 @@ void BotFindEnemy( bot_t &pBot )
          if (FIsClassname(pMonster, "monster_snark"))
             continue; // skip snarks
 
+         if(FIsClassname(pMonster, "monster_penguin"))
+             continue; // skip penguins
+
          if (FIsClassname(pMonster, "hostage_entity") || FIsClassname(pMonster, "monster_scientist"))
              continue; // skip hostages
 
