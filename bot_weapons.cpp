@@ -148,7 +148,7 @@ bot_weapon_select_t valve_weapon_select[NUM_OF_WEAPON_SELECTS] =
     W_IFL_KNIFE, 0, 0, FALSE, FALSE },
 
    {GEARBOX_WEAPON_GRAPPLE, WEAPON_SUBMOD_OP4, "weapon_grapple", WEAPON_MELEE, 1.0,
-    SKILL4, NOSKILL, TRUE, FALSE,
+    SKILL4, NOSKILL, FALSE, FALSE,
     0.0, 200.0, 0, 0, 100.0,
     5, TRUE, 100, 0, 0, TRUE, FALSE, FALSE, FALSE, 0.0, 0.0, FALSE, -1, -1,
     W_IFL_GRAPPLE, 0, 0, FALSE, FALSE },

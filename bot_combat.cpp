@@ -1656,7 +1656,8 @@ static qboolean BotFireWeapon(const Vector & v_enemy, bot_t &pBot, int weapon_ch
       if(!(weapon_choice == pSelect[select_index].iId || weapon_choice == 0))
          continue;
 
-      if(!IsValidWeaponChoose(pBot, pSelect[select_index]))
+      if(!IsValidWeaponChoose(pBot, pSelect[select_index]) ||
+         !BotIsCarryingWeapon(pBot, pSelect[select_index].iId))
          continue;
       
       // Underwater: only use avoidable weapon if can be used underwater
