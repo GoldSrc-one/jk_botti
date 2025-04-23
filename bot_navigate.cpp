@@ -301,18 +301,6 @@ static void BotEvaluateGoal( bot_t &pBot )
    }
 }
 
-static qboolean AreTeamMates(edict_t* pOther, edict_t* pEdict) {
-    // is team play enabled?
-    if(is_team_play) {
-        char other_model[MAX_TEAMNAME_LENGTH];
-        char edict_model[MAX_TEAMNAME_LENGTH];
-
-        return(!stricmp(UTIL_GetTeam(pOther, other_model, sizeof(other_model)), UTIL_GetTeam(pEdict, edict_model, sizeof(edict_model))));
-    }
-
-    return FALSE;
-}
-
 //
 static int BotGetSoundWaypoint( bot_t &pBot, edict_t *pTrackSoundEdict, edict_t ** pNewTrackSoundEdict )
 {
@@ -338,10 +326,7 @@ static int BotGetSoundWaypoint( bot_t &pBot, edict_t *pTrackSoundEdict, edict_t 
       if(pCurrentSound->m_iBotOwner == (&pBot - &bots[0]))
          continue;
 
-      if(!FNullEnt(pCurrentSound->m_pEdict) && AreTeamMates(pBot.pEdict, pCurrentSound->m_pEdict))
-          continue;
-
-      if(!FNullEnt(pCurrentSound->m_pEdict->v.owner) && AreTeamMates(pBot.pEdict, pCurrentSound->m_pEdict->v.owner))
+      if(AreOwnersTeamMates(pCurrentSound->m_pEdict, pBot.pEdict))
           continue;
       
       // we want specific waypoint?

@@ -332,6 +332,8 @@ void BotClient_Valve_Damage(void *p, int bot_index)
 
       if ((damage_armor > 0) || (damage_taken > 0))
       {
+         bots[bot_index].pInflictor = bots[bot_index].pEdict->v.dmg_inflictor;
+
          // ignore certain types of damage...
          if (damage_bits & IGNORE_DAMAGE)
             return;

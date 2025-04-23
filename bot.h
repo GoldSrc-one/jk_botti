@@ -246,6 +246,7 @@ typedef struct
    float f_next_find_visible_sound_enemy_time;
  
    float f_last_time_attacked;
+   edict_t *pInflictor;
 
    edict_t *killer_edict;
    qboolean  b_bot_say;

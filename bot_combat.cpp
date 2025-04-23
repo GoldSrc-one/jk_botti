@@ -603,6 +603,18 @@ qboolean AreTeamMates(edict_t * pOther, edict_t * pEdict)
    return FALSE;
 }
 
+qboolean AreOwnersTeamMates(edict_t* pOther, edict_t* pEdict) {
+    if(!is_team_play || !pOther || !pEdict)
+        return FALSE;
+
+    while(pOther->v.owner)
+        pOther = pOther->v.owner;
+    while(pEdict->v.owner)
+        pEdict = pEdict->v.owner;
+
+    return AreTeamMates(pOther, pEdict);
+}
+
 
 //
 static edict_t *BotFindEnemyNearestToPoint(bot_t &pBot, const Vector &v_point, float radius, Vector *v_found)
@@ -884,6 +896,22 @@ void BotFindEnemy( bot_t &pBot )
       edict_t *pMonster;
       Vector vecEnd;
 
+      //target the damage inflictor
+      if(pBot.pInflictor) {
+          if(!pBot.pInflictor->free && !(pBot.pInflictor->v.flags & FL_KILLME)
+             && pBot.pInflictor->v.takedamage != DAMAGE_NO && pBot.pInflictor->v.solid != SOLID_NOT && pBot.pInflictor->v.deadflag == DEAD_NO && pBot.pInflictor->v.health > 0
+             && !AreOwnersTeamMates(pEdict, pBot.pInflictor) ) {
+              Vector v_origin = UTIL_GetOriginWithExtent(pBot, pBot.pInflictor);
+              if(FInViewCone(v_origin, pEdict) && FVisibleEnemy(v_origin, pEdict, pBot.pInflictor)) {
+                  pNewEnemy = pBot.pInflictor;
+                  v_newenemy = v_origin;
+                  nearestdistance = GetModifiedEnemyDistance(pBot, v_origin - pEdict->v.origin).Length();
+
+                  pBot.pInflictor = NULL;
+              }
+          }
+      }
+
       // search func_breakables that we collected at map start (We need to collect in order to get the material value)
       pBreakable = NULL;
       while((pBreakable = UTIL_FindBreakable(pBreakable)) != NULL) 
@@ -956,17 +984,11 @@ void BotFindEnemy( bot_t &pBot )
          if (FIsClassname(pMonster, "hornet"))
             continue; // skip hornets
          
-         if (FIsClassname(pMonster, "monster_snark"))
-            continue; // skip snarks
-
-         if(FIsClassname(pMonster, "monster_penguin"))
-             continue; // skip penguins
-
-         if (FIsClassname(pMonster, "hostage_entity") || FIsClassname(pMonster, "monster_scientist"))
-             continue; // skip hostages
+         if(!pMonster->v.owner || AreOwnersTeamMates(pMonster, pEdict))
+             continue; // skip monsters not owned by anyone or owned by a teammate
 
          if (pMonster->v.health > 4000)
-	    continue; // skip monsters with large health
+	         continue; // skip monsters with large health
 
          float distance = GetModifiedEnemyDistance(pBot, UTIL_GetOriginWithExtent(pBot, pMonster) - pEdict->v.origin).Length();
          if (distance >= nearestdistance)

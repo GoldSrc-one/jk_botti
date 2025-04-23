@@ -136,6 +136,7 @@ static void BotSpawnInit( bot_t &pBot )
    pBot.b_low_health = 0;
    
    pBot.f_last_time_attacked = 0;
+   pBot.pInflictor = NULL;
    
    pBot.eagle_secondary_state = 0;
 
@@ -342,6 +343,7 @@ static void BotPickName( char *name_buffer, int sizeof_name_buffer )
 
    while (used)
    {
+      int bot_name_len = strlen(bot_names[name_index]);
       used = FALSE;
 
       for (index = 1; index <= gpGlobals->maxClients; index++)
@@ -351,15 +353,15 @@ static void BotPickName( char *name_buffer, int sizeof_name_buffer )
          if (pPlayer && !pPlayer->free && !FBitSet(pPlayer->v.flags, FL_PROXY))
          {
             const char * netname = STRING(pPlayer->v.netname);
-            
-            //check if bot name is [lvlX]name format...
-            if (strncmp(netname, "[lvl", 4) == 0 && netname[4] >= '1' && netname[4] <= '5' && netname[5] == ']')
-               netname += 6;
-            
-            if (strcmp(bot_names[name_index], netname) == 0)
-            {
-               used = TRUE;
-               break;
+            int netname_len = strlen(netname);
+
+            if(netname_len >= bot_name_len) {
+               //check name suffix
+               auto netname_suffix = netname + (netname_len - bot_name_len);
+               if(strcmp(bot_names[name_index], netname_suffix) == 0) {
+                  used = TRUE;
+                  break;
+               }
             }
          }
       }
@@ -1481,7 +1483,7 @@ endloop:
 static qboolean BotLookForGrenades( bot_t &pBot )
 {
    static const char * grenade_names[] = {
-      "grenade", /*"monster_satchel", "monster_snark",*/ "rpg_rocket", "hvr_rocket",
+      "grenade", "monster_satchel", "monster_snark", "rpg_rocket", "hvr_rocket", "monster_penguin",
       NULL,
    };
 
@@ -1504,7 +1506,7 @@ static qboolean BotLookForGrenades( bot_t &pBot )
          const char ** p_grna = grenade_names;
           
          while(*p_grna) {
-            if (FIsClassname(*p_grna, pent))
+            if(FIsClassname(*p_grna, pent) && !AreOwnersTeamMates(pEdict, pent))
                return TRUE;
             p_grna++;
          }
