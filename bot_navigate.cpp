@@ -667,9 +667,14 @@ static void BotFindWaypointGoal( bot_t &pBot )
          goto exit;
       }
    }
-   
+
+
+   char team[16];
+   UTIL_GetTeam(pBot.pEdict, team, 16);
+   bool isT = strcmp(team, "TERRORIST") == 0;
+   bool isCT = strcmp(team, "CT") == 0;
    //HACK
-   if(index == -1 && (pBot.satchel_state == SAT_NONE && BotIsCarryingWeapon(pBot, VALVE_WEAPON_SATCHEL))) {
+   if(index == -1 && isCT && (pBot.satchel_state == SAT_NONE && BotIsCarryingWeapon(pBot, VALVE_WEAPON_SATCHEL))) {
        edict_t* bombTarget = NULL;
        bombTarget = UTIL_FindEntityByClassname(bombTarget, "func_bomb_target");
        if(RANDOM_LONG2(0, 1))
@@ -677,15 +682,65 @@ static void BotFindWaypointGoal( bot_t &pBot )
 
        if(bombTarget) {
            Vector center;
-           center[0] = (bombTarget->v.mins[0] + bombTarget->v.maxs[0]) * 0.5f;
-           center[1] = (bombTarget->v.mins[1] + bombTarget->v.maxs[1]) * 0.5f;
-           center[2] = (bombTarget->v.mins[2] + bombTarget->v.maxs[2]) * 0.5f;
+           center[0] = (bombTarget->v.absmin[0] + bombTarget->v.absmax[0]) * 0.5f;
+           center[1] = (bombTarget->v.absmin[1] + bombTarget->v.absmax[1]) * 0.5f;
+           center[2] = (bombTarget->v.absmin[2] + bombTarget->v.absmax[2]) * 0.5f;
            index = WaypointFindNearest(center, bombTarget, 1024);
 
            if(index != -1) {
                pBot.satchel_state = SAT_GOING_TO_TARGET;
 
                pBot.wpt_goal_type = WPT_GOAL_BOMBSITE;
+               pBot.waypoint_goal = index;
+               pBot.pTrackSoundEdict = NULL;
+               pBot.f_track_sound_time = -1;
+
+               goto exit;
+           }
+       }
+   }
+
+   //HACK
+   if(index == -1) {
+       const int maxInterests = 64;
+       edict_t* interests[maxInterests] = {};
+       int numInterests = 0;
+
+       const char* classnames[] = {"func_bomb_target", "func_escapezone", "func_hostage_rescue", "func_vip_safetyzone", "hostage_entity", "info_bomb_target", "info_hostage_rescue", "monster_scientist"};
+       for(int i = 0; i < sizeof(classnames) / sizeof(classnames[0]); i++) {
+           edict_t* lastEntity = NULL;
+           while((lastEntity = UTIL_FindEntityByClassname(lastEntity, classnames[i])) && numInterests < maxInterests) {
+               interests[numInterests++] = lastEntity;
+           }
+       }
+
+       if(numInterests) {
+           auto selectedInterest = interests[RANDOM_LONG2(0, numInterests - 1)];
+           Vector center;
+           center[0] = (selectedInterest->v.absmin[0] + selectedInterest->v.absmax[0]) * 0.5f;
+           center[1] = (selectedInterest->v.absmin[1] + selectedInterest->v.absmax[1]) * 0.5f;
+           center[2] = (selectedInterest->v.absmin[2] + selectedInterest->v.absmax[2]) * 0.5f;
+
+           edict_t* enemies[32] = {};
+           int numEnemies = 0;
+           for(int i = 0; i < gpGlobals->maxClients; i++) {
+               edict_t* player = g_engfuncs.pfnPEntityOfEntIndex(i + 1);
+               if(!player || player->v.flags == FL_PROXY || player->v.deadflag != DEAD_NO || player->v.takedamage == DAMAGE_NO || player->v.solid == SOLID_NOT)
+                   continue;
+               if(AreTeamMates(pEdict, player))
+                   continue;
+
+               enemies[numEnemies++] = player;
+           }
+           if(numEnemies) {
+               edict_t* enemy = enemies[RANDOM_LONG2(0, numEnemies - 1)];
+               float flankFactor = RANDOM_FLOAT2(0.0f, 0.5f);
+               center = center * (1.0f - flankFactor) + enemy->v.origin * (flankFactor);
+           }
+
+           index = WaypointFindNearest(center, selectedInterest, 1024);
+           if(index != -1) {
+               pBot.wpt_goal_type = WPT_GOAL_LOCATION;
                pBot.waypoint_goal = index;
                pBot.pTrackSoundEdict = NULL;
                pBot.f_track_sound_time = -1;
