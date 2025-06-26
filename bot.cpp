@@ -1748,6 +1748,11 @@ static void BotJustWanderAround(bot_t &pBot, float moved_distance)
            return;
    }
 
+   if(IsCrossfire() && pBot.wpt_goal_type != WPT_GOAL_ENEMY && pBot.wpt_goal_type != WPT_GOAL_CROSSFIRE && CrossfireStrikeActive() && CrossfireInPain(pEdict)) {
+        pBot.wpt_goal_type = WPT_GOAL_NONE;
+        pBot.waypoint_goal = -1;
+   }
+
    // no enemy, let's just wander around...
 
    // logo spraying...

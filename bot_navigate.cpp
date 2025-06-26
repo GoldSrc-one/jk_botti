@@ -435,6 +435,26 @@ static void BotFindWaypointGoal( bot_t &pBot )
            }
        }
    }
+   
+   //HACK
+   if(IsCrossfire() && CrossfireStrikeActive() && CrossfireInPain(pEdict)) {
+       edict_t* button = CrossfireStrikeButton();
+       if(button) {
+           Vector center;
+           center[0] = (button->v.absmin[0] + button->v.absmax[0]) * 0.5f;
+           center[1] = (button->v.absmin[1] + button->v.absmax[1]) * 0.5f;
+           center[2] = (button->v.absmin[2] + button->v.absmax[2]) * 0.5f;
+           index = WaypointFindNearest(center, button, 512);
+           if(index != -1) {
+               pBot.wpt_goal_type = WPT_GOAL_CROSSFIRE;
+               pBot.waypoint_goal = index;
+               pBot.pTrackSoundEdict = NULL;
+               pBot.f_track_sound_time = -1;
+
+               goto exit;
+           }
+       }
+   }
 
    if (pEdict->v.health * RANDOM_FLOAT2(0.9f, 1.0f/0.9f) < VALVE_MAX_NORMAL_HEALTH * 0.25f)
    {
