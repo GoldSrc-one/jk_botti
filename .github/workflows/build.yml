@@ -40,6 +40,7 @@ jobs:
         run: |
           copy msvc\Release\jk_botti.dll addons\jk_botti\dlls\jk_botti_mm.dll
           copy msvc\Release\jk_botti.pdb addons\jk_botti\dlls\jk_botti_mm.pdb
+          del addons\jk_botti\dlls\.empty_dir
           Compress-Archive -Path addons\* -Destination addons.zip
 
       - name: Deploy artifacts
@@ -66,9 +67,7 @@ jobs:
         if: |
           startsWith(github.ref, 'refs/tags/')
         with:
-          files: |
-            *.dll
-            *.pdb
+          files: addons.zip
         env:
           GITHUB_TOKEN: ${{ secrets.API_TOKEN }}
 
