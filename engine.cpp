@@ -122,13 +122,13 @@ static void pfnPlaybackEvent( int flags, const edict_t *pInvoker, unsigned short
    // get event info
    event_info_t *pei;
    
-   for(pei = g_event_info; pei->eventname; pei++)
+   for(pei = g_event_info; pei->eventname && pei->eventname[0]; pei++)
    {
       if(eventindex == pei->eventindex)
          break;
    }
    
-   if(!pei->eventname)
+   if(!pei->eventname || !pei->eventname[0])
       RETURN_META (MRES_IGNORED);
    
    // event creates sound?
