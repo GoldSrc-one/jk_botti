@@ -47,7 +47,7 @@ void SaveSound(edict_t * pEdict, const Vector & origin, int volume, int channel,
       if(bots[i].is_used)
       {
          // is owner of object?
-         if(pEdict->v.owner == bots[i].pEdict)
+         if(pEdict && pEdict->v.owner == bots[i].pEdict)
          {
             bot_index = i;
             break;
