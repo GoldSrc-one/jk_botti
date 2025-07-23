@@ -132,8 +132,7 @@ static void pfnPlaybackEvent( int flags, const edict_t *pInvoker, unsigned short
       RETURN_META (MRES_IGNORED);
    
    // event creates sound?
-   if(pei->volume > 0.0f)
-   {
+   if(pei->volume > 0.0f && !FNullEnt(pInvoker)) {
       int ivolume = (int)(1000*pei->volume);
       
       SaveSound((edict_t*)pInvoker, pInvoker->v.origin, ivolume, CHAN_WEAPON, 5.0f);
@@ -177,7 +176,9 @@ static void pfnEmitSound(edict_t *entity, int channel, const char *sample, float
       else if (strcmp("item_longjump", classname) == 0)
          duration = 8.0f;
       
-      SaveSound(entity, entity->v.origin, ivolume, channel, duration);
+      if(!FNullEnt(entity)) {
+          SaveSound(entity, entity->v.origin, ivolume, channel, duration);
+      }
    }
 
    RETURN_META (MRES_IGNORED);
