@@ -1059,7 +1059,7 @@ void BotFindEnemy( bot_t &pBot )
             pBreakable->pEdict->v.health <= 0)
             continue;
 
-         if (pBreakable->pEdict->v.health > 8000)
+         if (pBreakable->pEdict->v.health > 300)
 	    continue; // skip breakables with large health
          
          Vector v_origin = UTIL_GetOriginWithExtent(pBot, pBreakable->pEdict);
@@ -1069,6 +1069,9 @@ void BotFindEnemy( bot_t &pBot )
             continue;
          
          float distance = GetModifiedEnemyDistance(pBot, v_origin - pEdict->v.origin).Length();
+         if(distance > 128)
+            continue; //ignore breakables unless they are really close
+
          if (distance >= nearestdistance)
             continue;
          
