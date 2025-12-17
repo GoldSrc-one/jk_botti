@@ -435,26 +435,6 @@ static void BotFindWaypointGoal( bot_t &pBot )
            }
        }
    }
-   
-   //HACK
-   if(IsCrossfire() && CrossfireStrikeActive() && CrossfireInPain(pEdict)) {
-       edict_t* button = CrossfireStrikeButton();
-       if(button) {
-           Vector center;
-           center[0] = (button->v.absmin[0] + button->v.absmax[0]) * 0.5f;
-           center[1] = (button->v.absmin[1] + button->v.absmax[1]) * 0.5f;
-           center[2] = (button->v.absmin[2] + button->v.absmax[2]) * 0.5f;
-           index = WaypointFindNearest(center, button, 512);
-           if(index != -1) {
-               pBot.wpt_goal_type = WPT_GOAL_CROSSFIRE;
-               pBot.waypoint_goal = index;
-               pBot.pTrackSoundEdict = NULL;
-               pBot.f_track_sound_time = -1;
-
-               goto exit;
-           }
-       }
-   }
 
    if (pEdict->v.health * RANDOM_FLOAT2(0.9f, 1.0f/0.9f) < VALVE_MAX_NORMAL_HEALTH * 0.25f)
    {
@@ -691,8 +671,8 @@ static void BotFindWaypointGoal( bot_t &pBot )
 
    char team[16];
    UTIL_GetTeam(pBot.pEdict, team, 16);
-   bool isT = strcmp(team, "TERRORIST") == 0;
-   bool isCT = strcmp(team, "CT") == 0;
+   //bool isT = strcmp(team, "TERRORIST") == 0;
+   bool isCT = strcmp(team, "CT") == 0 || strcmp(team, "BLUE") == 0;
    //HACK
    if(index == -1 && isCT && (pBot.satchel_state == SAT_NONE && BotIsCarryingWeapon(pBot, VALVE_WEAPON_SATCHEL))) {
        edict_t* bombTarget = NULL;
@@ -716,6 +696,40 @@ static void BotFindWaypointGoal( bot_t &pBot )
                pBot.f_track_sound_time = -1;
 
                goto exit;
+           }
+       }
+   }
+
+   //HACK
+   if(index == -1) {
+       int numGoals = 0;
+       {
+           edict_t* flag = NULL;
+           while((flag = UTIL_FindEntityByClassname(flag, "bot_goal")))
+               if(!flag->v.owner || flag->v.owner == pEdict)
+                   numGoals++;
+       }
+
+       if(numGoals > 0) {
+           int randomGoal = RANDOM_LONG2(0, numGoals - 1);
+           edict_t* flag = NULL;
+           while((flag = UTIL_FindEntityByClassname(flag, "bot_goal"))) {
+               if(!flag->v.owner || flag->v.owner == pEdict)
+                   randomGoal--;
+
+               if(randomGoal >= 0)
+                   continue;
+
+               index = WaypointFindNearest(flag, 1024);
+               if(index != -1) {
+                   pBot.wpt_goal_type = WPT_GOAL_FLAG;
+                   pBot.waypoint_goal = index;
+                   pBot.pTrackSoundEdict = flag;
+                   pBot.f_track_sound_time = -1;
+
+                   goto exit;
+               }
+               break;
            }
        }
    }
@@ -1098,6 +1112,10 @@ qboolean BotHeadTowardWaypoint( bot_t &pBot )
             pBot.pBotPickupItem = WaypointFindItem(pBot.waypoint_goal);
             pBot.f_find_item = gpGlobals->time + 0.2;
             pBot.f_last_item_found = gpGlobals->time;
+         }
+         if(pBot.wpt_goal_type == WPT_GOAL_FLAG) {
+             pBot.pBotPickupItem = pBot.pTrackSoundEdict;
+             pBot.f_last_item_found = gpGlobals->time;
          }
 
          if (pBot.pBotEnemy != NULL)
@@ -2534,7 +2552,7 @@ void BotLookForDrop( bot_t &pBot )
 qboolean BotDefuseC4(bot_t& pBot) {
     char team[16];
     UTIL_GetTeam(pBot.pEdict, team, 16);
-    if(!(strcmp(team, "CT") == 0))
+    if(!(strcmp(team, "CT") == 0) && !(strcmp(team, "BLUE") == 0))
         return FALSE;
 
     edict_t* c4 = UTIL_FindC4();

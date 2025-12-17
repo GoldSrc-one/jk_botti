@@ -159,43 +159,4 @@ inline edict_t* UTIL_FindC4(edict_t* pentStart = NULL) {
 	return NULL;
 }
 
-inline bool IsCrossfire() {
-	return strcmp(STRING(gpGlobals->mapname), "crossfire") == 0;
-}
-
-inline bool CrossfireStrikeActive() {
-	auto crossfireStrike = UTIL_FindEntityByTargetname(NULL, "strike_mm");
-	if(!crossfireStrike)
-		return false;
-
-	return crossfireStrike->v.nextthink > gpGlobals->time;
-}
-
-inline bool CrossfireInPain(edict_t* player) {
-	edict_t* pain = NULL;
-	while(pain = UTIL_FindEntityByTargetname(pain, "strike_pain")) {
-		if(pain->v.absmin.x <= player->v.absmax.x &&
-		   pain->v.absmin.y <= player->v.absmax.y &&
-		   pain->v.absmin.z <= player->v.absmax.z &&
-		   pain->v.absmax.x >= player->v.absmin.x &&
-		   pain->v.absmax.y >= player->v.absmin.y &&
-		   pain->v.absmax.z >= player->v.absmin.z) {
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-inline bool CrossfireStrikeAvailable() {
-	auto crossfireGreenlight = UTIL_FindEntityByTargetname(NULL, "towers_greenlight");
-	if(!crossfireGreenlight)
-		return false;
-
-	return (crossfireGreenlight->v.spawnflags & SF_LIGHT_START_OFF) == 0;
-}
-
-inline edict_t* CrossfireStrikeButton() {
-	return UTIL_FindEntityByTarget(NULL, "fire_button_texture");
-}
-
 #endif /*BOT_INLINE_FUNCS*/

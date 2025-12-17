@@ -424,6 +424,9 @@ static Vector GetPredictedPlayerPosition(bot_t &pBot, edict_t * pPlayer, qboolea
    {
       if(newer->time > time) 
       {
+         if(newer->older == newer)
+            break;
+
          //this is too new for us.. proceed
          newer = newer->older;
          continue;
@@ -952,9 +955,6 @@ void BotFindEnemy( bot_t &pBot )
             if (!(FInViewCone( vecEnd, pEdict ) && FVisibleEnemy( vecEnd, pEdict, pPlayer )))
                continue;
 
-            if(IsCrossfire() && CrossfireStrikeActive() && CrossfireInPain(pPlayer))
-               continue;
-
             nearestdistance = distance;
             pNewEnemy = pPlayer;
             v_newenemy = v_player;
@@ -1015,9 +1015,6 @@ void BotFindEnemy( bot_t &pBot )
          if (!(FInViewCone( vecEnd, pEdict ) && FVisibleEnemy( vecEnd, pEdict, pMonster )))
             continue;
 
-         if(IsCrossfire() && CrossfireStrikeActive() && CrossfireInPain(pMonster))
-            continue;
-
          nearestdistance = distance;
          pNewEnemy = pMonster;
          v_newenemy = pMonster->v.origin;
@@ -1038,9 +1035,6 @@ void BotFindEnemy( bot_t &pBot )
 #endif
       }
    }
-
-   if(pNewEnemy == NULL && IsCrossfire() && CrossfireStrikeActive())
-       return;
 
    if(pNewEnemy == NULL) {
       // search func_breakables that we collected at map start (We need to collect in order to get the material value)
@@ -1149,9 +1143,9 @@ void BotFindEnemy( bot_t &pBot )
       UTIL_ConsolePrintf("[%s] Found enemy, type: %s", pBot.name, enemy_type);
 #endif
 
-      // clear goal waypoint
-      pBot.waypoint_goal = -1;
-      pBot.wpt_goal_type = WPT_GOAL_ENEMY;
+       // clear goal waypoint
+       pBot.waypoint_goal = -1;
+       pBot.wpt_goal_type = WPT_GOAL_ENEMY;
    }
 
    // has the bot NOT seen an ememy for at least 5 seconds (time to reload)?

@@ -1040,7 +1040,7 @@ static void BotFindItem( bot_t &pBot )
    }
 
    // forget about item if it we picked it up
-   if (pBot.pBotPickupItem && ((pBot.pBotPickupItem->v.effects & EF_NODRAW) ||
+   if (pBot.pBotPickupItem && ((pBot.pBotPickupItem->v.effects & EF_NODRAW) || pBot.pBotPickupItem->v.aiment == pEdict ||
       !BotEntityIsVisible(pBot, UTIL_GetOriginWithExtent(pBot, pBot.pBotPickupItem))))
    {
       pBot.f_last_item_found = -1;
@@ -1746,11 +1746,6 @@ static void BotJustWanderAround(bot_t &pBot, float moved_distance)
 
        if(BotDefuseC4(pBot))
            return;
-   }
-
-   if(IsCrossfire() && pBot.wpt_goal_type != WPT_GOAL_ENEMY && pBot.wpt_goal_type != WPT_GOAL_CROSSFIRE && CrossfireStrikeActive() && CrossfireInPain(pEdict)) {
-        pBot.wpt_goal_type = WPT_GOAL_NONE;
-        pBot.waypoint_goal = -1;
    }
 
    // no enemy, let's just wander around...
